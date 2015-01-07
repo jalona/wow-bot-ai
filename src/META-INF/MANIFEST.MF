@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: jacob.jar AutoItX4Java.jar
+Main-Class: com.company.Main
+
