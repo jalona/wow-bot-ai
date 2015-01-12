@@ -12,8 +12,8 @@ public class Position implements Serializable{
     public Position(double x, double y) {
         this.x = x;
         this.y = y;
-        _x = (int) (x*2000);
-        _y = (int) (y*2000);
+        _x = (int) (x*300);
+        _y = (int) (y*300);
     }
 
     public Vector distanceTo(Position p){

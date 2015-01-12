@@ -3,8 +3,9 @@ package com.dzharvis.graph;
 import java.io.Serializable;
 
 public class Connection implements Serializable {
-    int weight = 100;
+    private int weight = 100;
     private final Node node;
+    private static final double MODIFIER = 0.95;
 
     public Connection(Node node) {
         this.node = node;
@@ -14,8 +15,8 @@ public class Connection implements Serializable {
         return weight;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void relax() {
+        weight = Math.round(weight*MODIFIER);   
     }
 
     public Node getNode() {
