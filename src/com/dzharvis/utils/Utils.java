@@ -42,7 +42,7 @@ public class Utils {
 
     private static HashSet<Node> dfs(Node from, Node to, HashMap<Node, Node> predecessor) {
         TreeSet<Node> enqueue = new TreeSet<>((o1, o2) -> {
-            int v = Integer.valueOf(o1.djScore).compareTo(o1.djScore);
+            int v = Integer.valueOf(o1.djScore).compareTo(o2.djScore);
             if(v==0) return -1;
             return v;
         });
