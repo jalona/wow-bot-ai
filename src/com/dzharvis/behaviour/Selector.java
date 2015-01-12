@@ -1,4 +1,4 @@
-package com.company.behaviour;
+package com.dzharvis.behaviour;
 
 import java.util.List;
 
