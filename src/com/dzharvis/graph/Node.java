@@ -20,10 +20,11 @@ public class Node implements Serializable {
         this.p = p;
     }
 
-    public void addConnection(Node n){
+    public Connection addConnection(Node n){
         Connection c = new Connection(n);
         links.add(c);
         nodes.put(n, c);
+        return c;
     }
 
     public boolean isLinkedTo(Node node){

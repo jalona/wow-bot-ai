@@ -24,6 +24,7 @@ public class GraphVisualizer {
     }
 
     public void save(){
+        System.out.println("saving");
         BufferedImage bImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D cg = bImg.createGraphics();
         paintComponent(cg);

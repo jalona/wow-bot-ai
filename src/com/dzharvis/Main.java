@@ -66,13 +66,18 @@ public class Main {
 //            reader.getFacing();
             Node randomPlayerPos = bgrec.getRandomPlayerPos();
             if(randomPlayerPos == null) {
+//                System.out.println("rand null");
                 continue;
             }
-            Node playerPos = new Node(reader.getCurrentPosition());
+//            System.out.println("rand not null");
+            Node playerPos = bgrec.getCurrentPosition();
             if(playerPos == null) {
+//                System.out.println("pl null");
                 continue;
             }
-                p.play(Utils.findShortest(playerPos, randomPlayerPos));
+            if(playerPos.equals(randomPlayerPos)) continue;
+//            System.out.println("pl not null");
+            p.play(Utils.findShortest(playerPos, randomPlayerPos));
         }
 //        r.startRecoding();
 //        TimeUnit.HOURS.sleep(15);

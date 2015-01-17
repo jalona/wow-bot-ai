@@ -12,8 +12,8 @@ import java.util.List;
 import static java.lang.Math.*;
 
 public class Parrot {
-    public static final int SPEED = 50;
-    private static final double MAX_SPEED = 25;
+    public static final int SPEED = 30;
+    private static final double MAX_SPEED = 20;
     private final ScreenReader reader;
     private final PlayerControls control;
 
@@ -23,32 +23,33 @@ public class Parrot {
     }
 
     public void play(List<Position> positionList) {
-        if(positionList == null) return;
-//        while (true) {
-
             positionList.forEach(this::move);
-
-//        }
     }
 
     private void move(Position p) {
+        PlayerInfo data = new PlayerInfo(reader.getFacing(), reader.getCurrentPosition());
         control.startRotating();
+        rotate(p, data, true);
         control.startMoving();
         while (true) {
-            PlayerInfo data = new PlayerInfo(reader.getFacing(), reader.getCurrentPosition());
-            if (abs(data.getCurrentPosition().distanceTo(p).getLength()) < 0.002) break;
-            rotate(p, data);
+            data = new PlayerInfo(reader.getFacing(), reader.getCurrentPosition());
+            if (abs(data.getCurrentPosition().distanceTo(p).getLength()) < 0.0025) break;
+            rotate(p, data, false);
         }
         control.stopRotating();
         control.stopMoving();
     }
 
-    private void rotate(Position nearestPosition, PlayerInfo data) {
+    private void rotate(Position nearestPosition, PlayerInfo data, boolean loop) {
         double angle = angle(nearestPosition, data);
-        double sin = sin(angle);
-        double v = cos(angle) < 0 ? (sin < 0 ? -SPEED : SPEED) : SPEED * sin;
-        v = abs(v) > MAX_SPEED ? (v < 0 ? -MAX_SPEED : MAX_SPEED) : v;
-        control.rotateCharacter((int) v);
+        do {
+            double sin = sin(angle);
+            double v = cos(angle) < 0 ? (sin < 0 ? -SPEED : SPEED) : SPEED * sin;
+            v = abs(v) > MAX_SPEED ? (v < 0 ? -MAX_SPEED : MAX_SPEED) : v;
+            control.rotateCharacter((int) v);
+            data = new PlayerInfo(reader.getFacing(), reader.getCurrentPosition());
+            angle = angle(nearestPosition, data);
+        } while(loop && (abs(cos(angle)) < 0.95));
     }
 
 

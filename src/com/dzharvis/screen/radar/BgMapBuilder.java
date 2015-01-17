@@ -1,6 +1,5 @@
 package com.dzharvis.screen.radar;
 
-import com.dzharvis.graph.Connection;
 import com.dzharvis.graph.GraphVisualizer;
 import com.dzharvis.graph.Node;
 import com.dzharvis.screen.ScreenReader;
@@ -12,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.abs;
@@ -50,26 +48,28 @@ public class BgMapBuilder extends Thread {
             long st = System.currentTimeMillis();
             readData();
             long end = System.currentTimeMillis();
-            System.out.println(1000.0/(end-st));
             try {
                 long timeout = DELAY - (end - st);
                 timeout = timeout < 0 ? 0 : timeout;
                 TimeUnit.MILLISECONDS.sleep(timeout);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("stopping");
                 break;
             }
         }
-        s();
+        save();
     }
 
-    protected void s() {
+    protected void save() {
         maps.entrySet().forEach((e) -> {
             GraphVisualizer gv = new GraphVisualizer();
             e.getValue().values().forEach(gv::addNode);
             gv.save();
         });
+        saveMap();
+    }
 
+    private void saveMap() {
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(new File(PATHNAME));
@@ -94,18 +94,19 @@ public class BgMapBuilder extends Thread {
         return map;
     }
 
+    private volatile Position randomPlayer;
+
     public Node getRandomPlayerPos() {
         HashMap<Position, Node> nodes = getNodes(sr.getInstanceID());
-        int num = sr.getNumOfPlayers();
-        Random random = new Random();
-        int i = random.nextInt(num + 1);
-//        for (int i = 1; i <= num; i++) {
-        Position srPlayerPosition = sr.getPlayerPosition(i);
-        if (nodes.get(srPlayerPosition) != null) {
-            return nodes.get(srPlayerPosition);
-        }
-//        }
-        return null;
+//        Collection<Node> values = nodes.values();
+//        int size = values.size();
+//        return (Node) values.toArray()[new Random().nextInt(size)];
+//        int num = sr.getNumOfPlayers();
+//        Random random = new Random();
+//        int i = random.nextInt(num + 1);
+//        Position srPlayerPosition = sr.getPlayerPosition(i);
+        return nodes.get(randomPlayer);
+//        return randomPlayer;
     }
 
     protected void readData() {
@@ -126,14 +127,12 @@ public class BgMapBuilder extends Thread {
                 }
                 this.lastPos.put(i, from);
                 nodes.put(srPlayerPosition, from);
-//                gr.addNode(from);
                 continue;
             }
             Node to = nodes.get(srPlayerPosition);
             if (to == null) {
                 to = new Node(srPlayerPosition);
                 nodes.put(srPlayerPosition, to);
-            } else {
             }
             if (!from.equals(to)) {
                 if (!connectionExists(from, to)) {
@@ -141,14 +140,13 @@ public class BgMapBuilder extends Thread {
                     try {
                         if (abs(from.getPosition().distanceTo(to.getPosition()).getLength()) < 0.025) {
                             from.addConnection(to);
-//                        gr.addNode(from);
+                            if (Math.random() > .1) randomPlayer = srPlayerPosition;
                         }
                     } finally {
                         Node.lock.unlock();
                     }
                 } else {
-                    Connection linkTo = from.getLinkTo(to);
-                    linkTo.setWeight(linkTo.getWeight() - 1);
+                    from.getLinkTo(to).relax();
                 }
             }
             this.lastPos.put(i, to);
@@ -159,4 +157,8 @@ public class BgMapBuilder extends Thread {
         return from.isLinkedTo(to);
     }
 
+    public Node getCurrentPosition() {
+        HashMap<Position, Node> nodes = getNodes(sr.getInstanceID());
+        return nodes.get(sr.getCurrentPosition());
+    }
 }

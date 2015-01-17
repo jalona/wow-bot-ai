@@ -5,6 +5,8 @@ import com.dzharvis.graph.Node;
 import java.util.*;
 
 import static java.lang.Math.atan2;
+import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.emptyList;
 
 public class Utils {
     public static int getRed(int c) {
@@ -24,25 +26,29 @@ public class Utils {
     }
 
     public static List<Position> findShortest(Node from, Node to) {
+        long st = currentTimeMillis();
         HashMap<Node, Node> predecessor = new HashMap<>();
         HashSet<Node> visited = dfs(from, to, predecessor);
         List<Position> path = new LinkedList<>();
         Node step = to;
-        if (predecessor.get(step) == null) return null;
         path.add(step.getPosition());
         while (predecessor.get(step) != null) {
             step = predecessor.get(step);
             path.add(step.getPosition());
         }
-        System.out.println(step.equals(from));
         Collections.reverse(path);
         visited.forEach((n)->n.djScore=Integer.MAX_VALUE);
+        if(!path.get(0).equals(from.getPosition())) {
+            return emptyList();
+        }
         return path;
     }
 
+
+
     private static HashSet<Node> dfs(Node from, Node to, HashMap<Node, Node> predecessor) {
         TreeSet<Node> enqueue = new TreeSet<>((o1, o2) -> {
-            int v = Integer.valueOf(o1.djScore).compareTo(o2.djScore);
+            int v = Integer.valueOf(o1.djScore).compareTo(o1.djScore);
             if(v==0) return -1;
             return v;
         });
